@@ -1,0 +1,180 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dispatch-page">
+
+    <!-- Dispatch Clearance Header -->
+    <div class="dispatch-banner">
+        <div class="banner-icon">✓</div>
+        <div class="banner-content">
+            <span class="banner-label">Quality Assurance</span>
+            <h2>CLEARED FOR DISPATCH</h2>
+            <p>Work Order: <strong>{{ t.work_order }}</strong></p>
+        </div>
+        <span class="clear-badge">APPROVED</span>
+    </div>
+
+    {% if manifest %}
+
+    <!-- Gate Pass -->
+    <div class="dispatch-card">
+
+        <div class="card-heading">
+            <div>
+                <span class="section-label">SHIPPING DOCUMENT</span>
+                <h3>Gate Pass / Packing Slip</h3>
+            </div>
+            <div class="document-icon">▤</div>
+        </div>
+
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">Customer PO</span>
+                <span class="detail-value">{{ manifest.customer_po }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Batch Size</span>
+                <span class="detail-value">{{ manifest.batch_size }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Vehicle Number</span>
+                <span class="detail-value">{{ manifest.vehicle }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Part Number / Name</span>
+                <span class="detail-value">{{ t.part }}</span>
+            </div>
+
+        </div>
+
+        <!-- Serial Numbers -->
+        <div class="serial-section">
+            <h4>Product Serial Numbers</h4>
+            <div class="serial-list">
+                {% for s in t.serials.all %}
+                    <span class="serial-chip">{{ s.number }}</span>
+                {% empty %}
+                    <span class="no-serials">No serial numbers available.</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Customer QR -->
+        <div class="qr-section">
+            <div class="qr-content">
+                <span class="section-label">DIGITAL VERIFICATION</span>
+                <h3>Customer Inspection QR</h3>
+                <p>
+                    Scan this QR code to access the certified inspection
+                    report for this work order.
+                </p>
+            </div>
+
+            <div class="qr-box">
+                <img
+                    src="{% url 'cert_qr' t.pk %}"
+                    alt="Customer inspection report QR code"
+                    class="dispatch-qr"
+                >
+                <span class="qr-caption">Scan to verify certificate</span>
+            </div>
+        </div>
+
+        <!-- Document Actions -->
+        <div class="document-actions">
+            <a class="btn-preview"
+               href="{% url 'cert' token %}"
+               target="_blank"
+               rel="noopener noreferrer">
+                ↗ Preview Certificate
+            </a>
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <!-- Create Shipping Manifest -->
+    <div class="dispatch-card">
+
+        <div class="card-heading">
+            <div>
+                <span class="section-label">SHIPPING INFORMATION</span>
+                <h3>Create Shipping Manifest</h3>
+                <p class="card-description">
+                    Enter the customer purchase order and vehicle details
+                    to prepare the gate pass.
+                </p>
+            </div>
+            <div class="document-icon">▤</div>
+        </div>
+
+        <form method="post" class="manifest-form">
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="customer_po">Customer PO</label>
+                    <input
+                        id="customer_po"
+                        name="customer_po"
+                        type="text"
+                        placeholder="Enter customer PO"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="batch_size">Batch Size</label>
+                    <input
+                        id="batch_size"
+                        name="batch_size"
+                        type="number"
+                        min="1"
+                        value="{{ t.quantity }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group form-full">
+                    <label for="vehicle">Vehicle Number</label>
+                    <input
+                        id="vehicle"
+                        name="vehicle"
+                        type="text"
+                        placeholder="e.g. WB 12 AB 1234"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="form-note">
+                <span class="note-icon">ⓘ</span>
+                Please verify all shipping details before creating
+                the manifest.
+            </div>
+
+            <button type="submit" class="btn-create">
+                ✓ Create Shipping Manifest
+            </button>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+    <div class="dispatch-footer">
+        <span>Dispatch Management System</span>
+        <span>Quality • Traceability • Shipping</span>
+    </div>
+
+</div>
+{% endblock %}

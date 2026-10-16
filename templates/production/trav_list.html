@@ -1,0 +1,488 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .travelers-page {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 24px;
+        color: #1e293b;
+        font-family: Arial, sans-serif;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .page-header h2 {
+        margin: 0 0 7px;
+        font-size: 27px;
+        font-weight: 700;
+    }
+
+    .page-subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .summary-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 20px;
+        margin-bottom: 22px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 13px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .04);
+    }
+
+    .summary-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 11px;
+        font-size: 23px;
+    }
+
+    .summary-title {
+        margin: 0 0 5px;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .summary-text {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .table-card {
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+    }
+
+    .table-heading {
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table-heading h3 {
+        margin: 0 0 5px;
+        font-size: 18px;
+    }
+
+    .table-heading p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .travelers-table {
+        width: 100%;
+        min-width: 720px;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .travelers-table th {
+        padding: 15px 18px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        white-space: nowrap;
+    }
+
+    .travelers-table td {
+        padding: 17px 18px;
+        border-top: 1px solid #edf2f7;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    .travelers-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .work-order {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .part-number {
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .heat-number {
+        color: #475569;
+        font-family: monospace;
+        font-size: 13px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 11px;
+        border-radius: 20px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-quarantined {
+        background: #fff1f2;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+    }
+
+    .action-links {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background .2s ease;
+    }
+
+    .open-btn {
+        color: #1d4ed8;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+    }
+
+    .open-btn:hover {
+        background: #dbeafe;
+    }
+
+    .gate-btn {
+        color: #fff;
+        background: #15803d;
+        border: 1px solid #15803d;
+    }
+
+    .gate-btn:hover {
+        background: #166534;
+    }
+
+    .mobile-list {
+        display: none;
+    }
+
+    .empty-state {
+        padding: 45px 20px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-state strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 16px;
+    }
+
+    @media (max-width: 760px) {
+        .travelers-page {
+            padding: 16px;
+        }
+
+        .page-header h2 {
+            font-size: 23px;
+        }
+
+        .desktop-table {
+            display: none;
+        }
+
+        .mobile-list {
+            display: grid;
+            gap: 14px;
+            padding: 14px;
+        }
+
+        .traveler-card {
+            padding: 17px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .traveler-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .traveler-card-header h4 {
+            margin: 0 0 6px;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .traveler-card-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .traveler-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px 12px;
+            margin-bottom: 18px;
+        }
+
+        .detail-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .traveler-actions {
+            display: flex;
+            gap: 9px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        .traveler-actions .action-btn {
+            flex: 1;
+            padding: 11px 8px;
+        }
+
+        .summary-card {
+            padding: 15px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .travelers-page {
+            padding: 10px;
+        }
+
+        .traveler-card {
+            padding: 13px;
+        }
+
+        .traveler-card-header {
+            flex-direction: column;
+        }
+
+        .traveler-actions {
+            flex-direction: column;
+        }
+
+        .traveler-details {
+            gap: 14px 8px;
+        }
+    }
+</style>
+
+<div class="travelers-page">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h2>Job Travelers</h2>
+            <p class="page-subtitle">
+                Manage work orders, raw material lots, and production status.
+            </p>
+        </div>
+    </div>
+
+    <!-- Information Banner -->
+    <div class="summary-card">
+        <div class="summary-icon" aria-hidden="true">▤</div>
+        <div>
+            <p class="summary-title">Production Traveler Register</p>
+            <p class="summary-text">
+                Review traveler details and access individual records or gate passes.
+            </p>
+        </div>
+    </div>
+
+    <!-- Travelers Table -->
+    <div class="table-card">
+        <div class="table-heading">
+            <h3>All Job Travelers</h3>
+            <p>Work order and material traceability records</p>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="desktop-table">
+            <div class="table-scroll">
+                <table class="travelers-table">
+                    <thead>
+                        <tr>
+                            <th>Work Order</th>
+                            <th>Part</th>
+                            <th>Heat Number</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for t in travelers %}
+                        <tr>
+                            <td>
+                                <span class="work-order">{{ t.work_order }}</span>
+                            </td>
+
+                            <td>
+                                <span class="part-number">{{ t.part }}</span>
+                            </td>
+
+                            <td>
+                                <span class="heat-number">
+                                    {{ t.raw_lot.heat_number|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status-badge {% if t.status == 'QUARANTINED' %}status-quarantined{% endif %}">
+                                    {{ t.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-links">
+                                    <a class="action-btn open-btn"
+                                       href="{% url 'trav_detail' t.pk %}">
+                                        View Details
+                                    </a>
+
+                                    <a class="action-btn gate-btn"
+                                       href="{% url 'gate_pass' t.pk %}">
+                                        Gate Pass
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <strong>No job travelers found</strong>
+                                    Job traveler records will appear here when available.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-list">
+            {% for t in travelers %}
+            <div class="traveler-card">
+
+                <div class="traveler-card-header">
+                    <div>
+                        <h4>{{ t.work_order }}</h4>
+                        <p>Part: {{ t.part }}</p>
+                    </div>
+
+                    <span class="status-badge {% if t.status == 'QUARANTINED' %}status-quarantined{% endif %}">
+                        {{ t.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="traveler-details">
+                    <div>
+                        <span class="detail-label">Work Order</span>
+                        <div class="detail-value">{{ t.work_order }}</div>
+                    </div>
+
+                    <div>
+                        <span class="detail-label">Part Number</span>
+                        <div class="detail-value">{{ t.part }}</div>
+                    </div>
+
+                    <div>
+                        <span class="detail-label">Raw Material Heat</span>
+                        <div class="detail-value">
+                            {{ t.raw_lot.heat_number|default:"—" }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="detail-label">Current Status</span>
+                        <div class="detail-value">{{ t.get_status_display }}</div>
+                    </div>
+                </div>
+
+                <div class="traveler-actions">
+                    <a class="action-btn open-btn"
+                       href="{% url 'trav_detail' t.pk %}">
+                        View Details
+                    </a>
+
+                    <a class="action-btn gate-btn"
+                       href="{% url 'gate_pass' t.pk %}">
+                        Gate Pass
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <strong>No job travelers found</strong>
+                Job traveler records will appear here when available.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

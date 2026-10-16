@@ -1,0 +1,512 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .templates-page {
+        max-width: 1150px;
+        margin: 0 auto;
+        padding: 12px;
+        color: #172033;
+    }
+
+    .templates-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .templates-header h2 {
+        margin: 0 0 8px;
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 750;
+        letter-spacing: -0.5px;
+    }
+
+    .templates-header p {
+        margin: 0;
+        max-width: 680px;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .admin-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        color: #334155;
+        background: #fff;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+    .admin-link:hover {
+        background: #f8fafc;
+    }
+
+    .templates-summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .summary-card {
+        padding: 18px;
+        border: 1px solid #e2e8f0;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.035);
+    }
+
+    .summary-label {
+        margin-bottom: 8px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .summary-value {
+        color: #0f172a;
+        font-size: 27px;
+        font-weight: 750;
+        line-height: 1.2;
+    }
+
+    .templates-panel {
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .panel-header h3 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .panel-header span {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .templates-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .templates-table th {
+        padding: 13px 18px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 750;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .templates-table td {
+        padding: 16px 18px;
+        border-top: 1px solid #edf2f7;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    .templates-table tbody tr:hover {
+        background: #fbfdff;
+    }
+
+    .part-name {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .revision {
+        display: inline-block;
+        min-width: 32px;
+        padding: 5px 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .field-count {
+        color: #334155;
+        font-weight: 650;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-badge::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .status-draft {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .status-released {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .approved-by {
+        display: block;
+        max-width: 210px;
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .release-form {
+        margin: 0;
+    }
+
+    .release-button {
+        min-height: 38px;
+        padding: 9px 14px;
+        border: none;
+        border-radius: 8px;
+        background: #15803d;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .release-button:hover {
+        background: #166534;
+    }
+
+    .empty-state {
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 14px;
+        border-radius: 15px;
+        background: #f1f5f9;
+        font-size: 25px;
+    }
+
+    .empty-state h4 {
+        margin: 0 0 7px;
+        color: #334155;
+        font-size: 16px;
+    }
+
+    .empty-state p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    @media (max-width: 760px) {
+        .templates-header {
+            flex-direction: column;
+        }
+
+        .templates-summary {
+            gap: 10px;
+        }
+
+        .summary-card {
+            padding: 14px;
+        }
+
+        .summary-value {
+            font-size: 23px;
+        }
+
+        /* Convert table rows into readable cards on smaller screens. */
+        .templates-table,
+        .templates-table tbody {
+            display: block;
+            width: 100%;
+        }
+
+        .templates-table thead {
+            display: none;
+        }
+
+        .templates-table tbody tr {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 12px;
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .templates-table td {
+            display: block;
+            min-width: 0;
+            padding: 0;
+            border: none;
+            overflow-wrap: anywhere;
+        }
+
+        .templates-table td::before {
+            display: block;
+            margin-bottom: 7px;
+            color: #64748b;
+            content: attr(data-label);
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .templates-table td:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .release-button {
+            width: 100%;
+        }
+
+        .panel-header {
+            padding: 16px;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .templates-page {
+            padding: 8px;
+        }
+
+        .templates-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .summary-label {
+            margin: 0;
+        }
+
+        .summary-value {
+            font-size: 21px;
+        }
+
+        .templates-table tbody tr {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+
+<div class="templates-page">
+
+    <header class="templates-header">
+        <div>
+            <h2>Inspection Templates</h2>
+            <p>
+                Manage inspection standards, revisions, and release status.
+                Create or edit drafts in Admin. Only authorized Quality Managers
+                should release templates for production use.
+            </p>
+        </div>
+
+        <a
+            href="/admin/quality/inspectiontemplate/"
+            class="admin-link"
+        >
+            Manage in Admin ↗
+        </a>
+    </header>
+
+    <section class="templates-summary">
+        <div class="summary-card">
+            <div class="summary-label">Total templates</div>
+            <div class="summary-value">{{ templates|length }}</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Released templates</div>
+            <div class="summary-value">
+                {% with released_count=0 %}
+                    {% for t in templates %}
+                        {% if t.is_released %}
+                            <span class="released-count-item" hidden>1</span>
+                        {% endif %}
+                    {% endfor %}
+                    <span id="released-count">—</span>
+                {% endwith %}
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Draft templates</div>
+            <div class="summary-value">
+                <span id="draft-count">—</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="templates-panel">
+        <div class="panel-header">
+            <h3>Template register</h3>
+            <span>Inspection standard control</span>
+        </div>
+
+        <div class="table-scroll">
+            <table class="templates-table">
+                <thead>
+                    <tr>
+                        <th>Part</th>
+                        <th>Revision</th>
+                        <th>Fields</th>
+                        <th>Release status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for t in templates %}
+                    <tr>
+                        <td data-label="Part">
+                            <span class="part-name">{{ t.part }}</span>
+                        </td>
+
+                        <td data-label="Revision">
+                            <span class="revision">{{ t.revision }}</span>
+                        </td>
+
+                        <td data-label="Fields">
+                            <span class="field-count">{{ t.fields.count }}</span>
+                            <span style="color:#64748b;font-size:12px;">fields</span>
+                        </td>
+
+                        <td data-label="Release status">
+                            {% if t.is_released %}
+                                <span class="status-badge status-released">
+                                    Released
+                                </span>
+                                <span class="approved-by">
+                                    Released by {{ t.approved_by|default:"Quality Manager" }}
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-draft">
+                                    Draft
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td data-label="Action">
+                            {% if not t.is_released %}
+                                <form
+                                    method="post"
+                                    action="{% url 'tpl_release' t.pk %}"
+                                    class="release-form"
+                                    onsubmit="return confirm('Release this inspection template? Please verify the part, revision, and inspection fields before continuing.');"
+                                >
+                                    {% csrf_token %}
+                                    <button type="submit" class="release-button">
+                                        Release template
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span style="color:#94a3b8;font-size:13px;">
+                                    No action
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon" aria-hidden="true">📋</div>
+                                <h4>No inspection templates yet</h4>
+                                <p>
+                                    Create an inspection template draft in Admin.
+                                    It will appear here when available for review.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Update the summary counts from the rendered template rows.
+    (function () {
+        const rows = document.querySelectorAll(
+            ".templates-table tbody tr"
+        );
+        let released = 0;
+        let drafts = 0;
+
+        rows.forEach(row => {
+            if (row.querySelector(".status-released")) {
+                released++;
+            } else if (row.querySelector(".status-draft")) {
+                drafts++;
+            }
+        });
+
+        document.getElementById("released-count").textContent = released;
+        document.getElementById("draft-count").textContent = drafts;
+    })();
+</script>
+{% endblock %}

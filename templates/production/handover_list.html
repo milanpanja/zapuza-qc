@@ -1,0 +1,140 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="handover-page">
+
+    <div class="handover-header">
+        <div>
+            <span class="handover-eyebrow">PRODUCTION MANAGEMENT</span>
+            <h2>Shift Handovers</h2>
+            <p>Track machine status, production output, scrap, and shift communication.</p>
+        </div>
+
+        <a class="handover-primary-btn" href="{% url 'handover_new' %}">
+            <span>+</span> New Handover
+        </a>
+    </div>
+
+    <div class="handover-info">
+        <div class="handover-info-icon">↔</div>
+        <div>
+            <strong>Shift transition overview</strong>
+            <p>Review the outgoing shift's information and acknowledge each handover when reviewed.</p>
+        </div>
+    </div>
+
+    <div class="handover-card">
+        <div class="handover-card-header">
+            <div>
+                <h3>Handover Records</h3>
+                <p>Machine-wise production and shift updates</p>
+            </div>
+            <span class="handover-count">{{ items|length }} Records</span>
+        </div>
+
+        <div class="handover-table-wrap">
+            <table class="handover-table">
+                <thead>
+                    <tr>
+                        <th>Machine</th>
+                        <th>Shift</th>
+                        <th>Outgoing Operator</th>
+                        <th>Parts / Scrap</th>
+                        <th>Machine Health / Tool Wear</th>
+                        <th>Acknowledgment</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for h in items %}
+                    <tr>
+                        <td data-label="Machine">
+                            <strong class="handover-machine">{{ h.machine }}</strong>
+                        </td>
+
+                        <td data-label="Shift">
+                            <span class="handover-shift">{{ h.shift }}</span>
+                        </td>
+
+                        <td data-label="Outgoing Operator">
+                            <span class="handover-operator">{{ h.outgoing_user }}</span>
+                        </td>
+
+                        <td data-label="Parts / Scrap">
+                            <div class="production-stats">
+                                <span class="parts-stat">
+                                    {{ h.parts_produced }} parts
+                                </span>
+                                <span class="scrap-stat">
+                                    {{ h.scrap_count }} scrap
+                                </span>
+                            </div>
+                        </td>
+
+                        <td data-label="Machine Health / Tool Wear">
+                            <div class="health-notes">
+                                <div>
+                                    <span class="note-label">Health</span>
+                                    <span>{{ h.machine_health|default:"Not specified" }}</span>
+                                </div>
+                                <div>
+                                    <span class="note-label">Tool wear</span>
+                                    <span>{{ h.tool_wear|default:"Not specified" }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td data-label="Acknowledgment">
+                            {% if h.acknowledged_at %}
+                                <div class="ack-status acknowledged">
+                                    <span class="ack-icon">✓</span>
+                                    <div>
+                                        <strong>Acknowledged</strong>
+                                        <small>By {{ h.acknowledged_by }}</small>
+                                        <small>{{ h.acknowledged_at|date:"d M Y, h:i A" }}</small>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="ack-status pending-ack">
+                                    <span class="pending-dot"></span>
+                                    <strong>Pending</strong>
+                                </div>
+
+                                <form method="post"
+                                      action="{% url 'handover_ack' h.pk %}"
+                                      class="handover-ack-form"
+                                      onsubmit="return confirm('Have you reviewed this shift handover and are ready to acknowledge it?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="handover-ack-btn">
+                                        ✓ Acknowledge
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="handover-empty">
+                            <div class="handover-empty-icon">📋</div>
+                            <h3>No handover records yet</h3>
+                            <p>Create a new handover to record shift updates.</p>
+                            <a class="handover-primary-btn" href="{% url 'handover_new' %}">
+                                + New Handover
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="handover-footer">
+            <span>Shift communication and production tracking</span>
+            <span>Review records before acknowledging</span>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

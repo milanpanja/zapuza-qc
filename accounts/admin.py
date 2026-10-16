@@ -1,0 +1,9 @@
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import User
+
+@admin.register(User)
+class AppUserAdmin(UserAdmin):
+    fieldsets = UserAdmin.fieldsets + (("Plant role", {"fields": ("role",)}),)
+    add_fieldsets = UserAdmin.add_fieldsets + (("Plant role", {"fields": ("role", "email")}),)
+    list_display = ("username", "role", "email", "is_active")

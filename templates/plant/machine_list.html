@@ -1,0 +1,102 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="machines-page">
+
+    <div class="machines-header">
+        <div>
+            <h2>Machine Management</h2>
+            <p>Monitor machine maintenance and daily PM status.</p>
+        </div>
+        <div class="machine-count">
+            Total Machines: {{ rows|length }}
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="machines-table">
+                <thead>
+                    <tr>
+                        <th>Machine</th>
+                        <th>Site</th>
+                        <th>Today's PM Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for m, ok in rows %}
+                    <tr>
+                        <td data-label="Machine">
+                            <div class="machine-info">
+                                <span class="machine-icon">⚙️</span>
+                                <div>
+                                    <strong>{{ m.code }}</strong>
+                                    <span class="machine-name">{{ m.name }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td data-label="Site">
+                            <span class="site-name">{{ m.site }}</span>
+                        </td>
+
+                        <td data-label="Today's PM Status">
+                            {% if ok %}
+                                <span class="status-badge status-done">
+                                    <span class="status-dot"></span>
+                                    Done
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-pending">
+                                    <span class="status-dot"></span>
+                                    Pending
+                                </span>
+                                <div class="status-note">
+                                    Job selection locked
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td data-label="Actions">
+                            <div class="machine-actions">
+                                <form method="post"
+                                      action="{% url 'machine_pm' m.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-pm">
+                                        ✓ Mark PM Done
+                                    </button>
+                                </form>
+
+                                <a class="btn-qr"
+                                   href="{% url 'machine_qr' m.pk %}"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    ▦ QR Plate
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <div class="empty-icon">⚙️</div>
+                            <strong>No machines found</strong>
+                            <p>There are no machines available to display.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="machines-footer">
+        <span>Machine Maintenance Dashboard</span>
+        <span>Daily Preventive Maintenance (PM)</span>
+    </div>
+
+</div>
+{% endblock %}

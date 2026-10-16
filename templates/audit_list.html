@@ -1,0 +1,511 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .audit-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 12px;
+        color: #172033;
+    }
+
+    .audit-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .audit-header h2 {
+        margin: 0 0 8px;
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 750;
+        letter-spacing: -0.5px;
+    }
+
+    .audit-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .readonly-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        flex-shrink: 0;
+        padding: 8px 12px;
+        border: 1px solid #bfdbfe;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .audit-summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        padding: 17px 19px;
+        border: 1px solid #e2e8f0;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.035);
+    }
+
+    .summary-label {
+        margin-bottom: 7px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .summary-value {
+        color: #0f172a;
+        font-size: 25px;
+        font-weight: 750;
+    }
+
+    .audit-panel {
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .audit-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 18px 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .audit-toolbar h3 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .audit-toolbar p {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .audit-search {
+        display: flex;
+        flex: 1;
+        max-width: 460px;
+        gap: 8px;
+    }
+
+    .audit-search input {
+        width: 100%;
+        min-width: 0;
+        min-height: 42px;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: #fff;
+        color: #0f172a;
+        font: inherit;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .audit-search input:focus {
+        outline: 3px solid #dbeafe;
+        border-color: #2563eb;
+    }
+
+    .search-button {
+        min-height: 42px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 9px;
+        background: #1d4ed8;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .search-button:hover {
+        background: #1e40af;
+    }
+
+    .reset-link {
+        align-self: center;
+        color: #475569;
+        font-size: 13px;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .reset-link:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .audit-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .audit-table th {
+        padding: 13px 15px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 750;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .audit-table td {
+        max-width: 300px;
+        padding: 15px;
+        border-top: 1px solid #edf2f7;
+        color: #334155;
+        font-size: 13px;
+        line-height: 1.6;
+        vertical-align: top;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+    }
+
+    .audit-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .log-time {
+        min-width: 120px;
+        color: #475569;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .log-user {
+        color: #0f172a;
+        font-weight: 650;
+    }
+
+    .action-badge {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 11px;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .value-cell {
+        min-width: 150px;
+        max-width: 260px;
+    }
+
+    .old-value {
+        color: #b91c1c;
+    }
+
+    .new-value {
+        color: #15803d;
+    }
+
+    .ip-address {
+        color: #64748b;
+        font-family: monospace;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .empty-state {
+        padding: 42px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 14px;
+        border-radius: 15px;
+        background: #f1f5f9;
+        font-size: 24px;
+    }
+
+    .empty-state h4 {
+        margin: 0 0 7px;
+        color: #334155;
+        font-size: 16px;
+    }
+
+    .empty-state p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    @media (max-width: 850px) {
+        .audit-header {
+            flex-direction: column;
+        }
+
+        .audit-toolbar {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .audit-search {
+            max-width: none;
+        }
+
+        .audit-table,
+        .audit-table tbody {
+            display: block;
+            width: 100%;
+        }
+
+        .audit-table thead {
+            display: none;
+        }
+
+        .audit-table tbody tr {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 12px;
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .audit-table td {
+            display: block;
+            min-width: 0;
+            max-width: none;
+            padding: 0;
+            border: none;
+        }
+
+        .audit-table td::before {
+            display: block;
+            margin-bottom: 6px;
+            color: #64748b;
+            content: attr(data-label);
+            font-size: 10px;
+            font-weight: 750;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .audit-table td.value-cell {
+            min-width: 0;
+        }
+
+        .audit-table td:nth-child(1),
+        .audit-table td:nth-child(2),
+        .audit-table td:nth-child(3),
+        .audit-table td:nth-child(4),
+        .audit-table td:nth-child(7) {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .audit-page {
+            padding: 8px;
+        }
+
+        .audit-summary {
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+        .summary-card {
+            padding: 13px;
+        }
+
+        .summary-value {
+            font-size: 21px;
+        }
+
+        .audit-toolbar {
+            padding: 15px;
+        }
+
+        .audit-search {
+            flex-wrap: wrap;
+        }
+
+        .audit-search input {
+            flex-basis: 100%;
+        }
+
+        .search-button {
+            flex: 1;
+        }
+
+        .audit-table tbody tr {
+            grid-template-columns: 1fr 1fr;
+            padding: 14px;
+        }
+    }
+</style>
+
+<div class="audit-page">
+
+    <header class="audit-header">
+        <div>
+            <h2>Audit Trail</h2>
+            <p>
+                Review recorded system activity, user actions, and changes
+                to important production and quality records.
+            </p>
+        </div>
+
+        <span class="readonly-badge">
+            🔒 Read-only records
+        </span>
+    </header>
+
+    <section class="audit-summary">
+        <div class="summary-card">
+            <div class="summary-label">Records displayed</div>
+            <div class="summary-value" id="visible-count">
+                {{ logs|length }}
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Access mode</div>
+            <div class="summary-value" style="font-size:20px;">
+                Read-only
+            </div>
+        </div>
+    </section>
+
+    <section class="audit-panel">
+        <div class="audit-toolbar">
+            <div>
+                <h3>Activity records</h3>
+                <p>Search available audit entries below.</p>
+            </div>
+
+            <form method="get" class="audit-search">
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ q|default:'' }}"
+                    placeholder="Search user, action, object, or value..."
+                    aria-label="Search audit records"
+                >
+                <button type="submit" class="search-button">
+                    Search
+                </button>
+
+                {% if q %}
+                    <a href="?" class="reset-link">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="table-scroll">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Object</th>
+                        <th>Old value</th>
+                        <th>New value</th>
+                        <th>IP address</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for l in logs %}
+                    <tr>
+                        <td data-label="Time" class="log-time">
+                            {{ l.timestamp|date:"d M Y H:i:s" }}
+                        </td>
+
+                        <td data-label="User">
+                            <span class="log-user">
+                                {{ l.user|default:"System" }}
+                            </span>
+                        </td>
+
+                        <td data-label="Action">
+                            <span class="action-badge">
+                                {{ l.action }}
+                            </span>
+                        </td>
+
+                        <td data-label="Object">
+                            {{ l.object_repr|default:"—" }}
+                        </td>
+
+                        <td data-label="Old value" class="value-cell old-value">
+                            {{ l.old_value|default:"—" }}
+                        </td>
+
+                        <td data-label="New value" class="value-cell new-value">
+                            {{ l.new_value|default:"—" }}
+                        </td>
+
+                        <td data-label="IP address">
+                            <span class="ip-address">
+                                {{ l.ip_address|default:"—" }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon" aria-hidden="true">📋</div>
+                                <h4>No audit records found</h4>
+                                <p>
+                                    {% if q %}
+                                        No records matched your search.
+                                        Try another keyword.
+                                    {% else %}
+                                        System activity records will appear here
+                                        when available.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

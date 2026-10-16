@@ -1,0 +1,445 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .mrb-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+        color: #1e293b;
+        font-family: Arial, sans-serif;
+    }
+
+    .mrb-header {
+        margin-bottom: 24px;
+    }
+
+    .mrb-header h2 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        line-height: 1.4;
+    }
+
+    .mrb-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .mrb-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px;
+        margin-bottom: 24px;
+        border: 1px solid #fecaca;
+        border-left: 5px solid #dc2626;
+        border-radius: 12px;
+        background: #fef2f2;
+        color: #991b1b;
+        line-height: 1.6;
+    }
+
+    .mrb-alert strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .mrb-alert p {
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .mrb-section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .mrb-section-heading h3 {
+        margin: 0;
+        font-size: 19px;
+    }
+
+    .mrb-count {
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #fff1f2;
+        color: #be123c;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .mrb-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .mrb-card {
+        min-width: 0;
+        padding: 21px;
+        border: 1px solid #e2e8f0;
+        border-top: 4px solid #dc2626;
+        border-radius: 13px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+    }
+
+    .mrb-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+
+    .mrb-card-header h4 {
+        margin: 0 0 7px;
+        font-size: 16px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .mrb-job {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    .mrb-status {
+        display: inline-block;
+        padding: 6px 9px;
+        border-radius: 20px;
+        background: #fff1f2;
+        color: #be123c;
+        font-size: 10px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .mrb-divider {
+        height: 1px;
+        margin: 17px 0;
+        background: #e2e8f0;
+    }
+
+    .mrb-form {
+        display: grid;
+        gap: 15px;
+    }
+
+    .mrb-field label {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .mrb-control {
+        display: block;
+        width: 100%;
+        min-height: 43px;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #0f172a;
+        font-family: inherit;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .mrb-control:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    input[type="file"].mrb-control {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .mrb-help {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .mrb-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 44px;
+        padding: 11px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #1d4ed8;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .mrb-button:hover {
+        background: #1e40af;
+    }
+
+    .mrb-button:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
+    .mrb-empty {
+        grid-column: 1 / -1;
+        padding: 38px 20px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        background: #f8fafc;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .mrb-empty strong {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 16px;
+    }
+
+    .concession-section {
+        margin-top: 32px;
+    }
+
+    .concession-section .mrb-section-heading h3 {
+        color: #92400e;
+    }
+
+    .concession-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .concession-card {
+        padding: 17px;
+        border: 1px solid #fde68a;
+        border-left: 4px solid #d97706;
+        border-radius: 11px;
+        background: #fffbeb;
+        overflow-wrap: anywhere;
+    }
+
+    .concession-card strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #78350f;
+        font-size: 14px;
+    }
+
+    .concession-card p {
+        margin: 0;
+        color: #92400e;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 850px) {
+        .mrb-page {
+            padding: 17px;
+        }
+
+        .mrb-list,
+        .concession-list {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .mrb-page {
+            padding: 11px;
+        }
+
+        .mrb-header h2 {
+            font-size: 21px;
+        }
+
+        .mrb-card {
+            padding: 16px;
+        }
+
+        .mrb-card-header {
+            flex-direction: column;
+        }
+
+        .mrb-alert {
+            padding: 13px;
+        }
+
+        .mrb-section-heading h3 {
+            font-size: 17px;
+        }
+    }
+</style>
+
+<div class="mrb-page">
+
+    <!-- Page Header -->
+    <header class="mrb-header">
+        <h2>Material Review Board (MRB)</h2>
+        <p>
+            Rejection Holding Area — review nonconforming material and record
+            authorized disposition decisions.
+        </p>
+    </header>
+
+    <!-- Safety Notice -->
+    <div class="mrb-alert" role="alert">
+        <span aria-hidden="true" style="font-size:22px;">⚠</span>
+        <div>
+            <strong>Nonconforming Material Control</strong>
+            <p>
+                Review each item carefully before making a disposition decision.
+                Customer concessions require the appropriate written approval.
+            </p>
+        </div>
+    </div>
+
+    <!-- Rejected Items -->
+    <section>
+        <div class="mrb-section-heading">
+            <h3>Items Awaiting Review</h3>
+            <span class="mrb-count">Pending Review</span>
+        </div>
+
+        <div class="mrb-list">
+            {% for i in items %}
+            <article class="mrb-card">
+
+                <div class="mrb-card-header">
+                    <div>
+                        <h4>{{ i }}</h4>
+                        <p class="mrb-job">
+                            Job Reference: {{ i.job }}
+                        </p>
+                    </div>
+
+                    <span class="mrb-status">Requires Review</span>
+                </div>
+
+                <div class="mrb-divider"></div>
+
+                <form method="post"
+                      enctype="multipart/form-data"
+                      class="mrb-form">
+                    {% csrf_token %}
+
+                    <input type="hidden"
+                           name="inspection"
+                           value="{{ i.pk }}">
+
+                    <div class="mrb-field">
+                        <label for="action-{{ i.pk }}">
+                            Disposition Decision
+                        </label>
+
+                        <select
+                            name="action"
+                            id="action-{{ i.pk }}"
+                            class="mrb-control"
+                            required>
+                            {% for v, l in actions %}
+                            <option value="{{ v }}">{{ l }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <span class="mrb-help">
+                            Select the authorized disposition for this item.
+                        </span>
+                    </div>
+
+                    <div class="mrb-field">
+                        <label for="note-{{ i.pk }}">
+                            Review Notes
+                        </label>
+
+                        <input
+                            type="text"
+                            name="note"
+                            id="note-{{ i.pk }}"
+                            class="mrb-control"
+                            placeholder="Enter reason or decision notes">
+                    </div>
+
+                    <div class="mrb-field">
+                        <label for="approval-{{ i.pk }}">
+                            Customer Approval Document
+                        </label>
+
+                        <input
+                            type="file"
+                            name="approval"
+                            id="approval-{{ i.pk }}"
+                            class="mrb-control"
+                            accept=".pdf,.jpg,.jpeg,.png">
+
+                        <span class="mrb-help">
+                            Attach the written customer approval when required
+                            for a customer concession.
+                        </span>
+                    </div>
+
+                    <button type="submit" class="mrb-button">
+                        Submit Disposition
+                    </button>
+                </form>
+            </article>
+
+            {% empty %}
+            <div class="mrb-empty">
+                <strong>No Items Awaiting Review</strong>
+                There are currently no items in the MRB review queue.
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Pending Customer Concessions -->
+    {% if pending_cc %}
+    <section class="concession-section">
+        <div class="mrb-section-heading">
+            <h3>Customer Concessions Awaiting Approval</h3>
+        </div>
+
+        <div class="concession-list">
+            {% for d in pending_cc %}
+            <article class="concession-card">
+                <strong>⌛ Approval Pending</strong>
+                <p>
+                    <b>Inspection:</b> {{ d.inspection }}
+                </p>
+                <p style="margin-top:8px;">
+                    Upload the written approval through
+                    <b>Admin &gt; MRB dispositions</b>.
+                </p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+
+{% endblock %}

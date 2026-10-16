@@ -1,0 +1,61 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="interlock-page">
+
+    <div class="interlock-card">
+
+        <div class="interlock-icon">
+            <span>🔒</span>
+        </div>
+
+        <div class="interlock-badge">
+            SHIPPING BLOCKED
+        </div>
+
+        <h2>Shipping Interlock</h2>
+
+        <p class="work-order">
+            Work Order:
+            <strong>{{ t.work_order }}</strong>
+        </p>
+
+        <div class="alert-message">
+            <strong>Shipping documents are locked.</strong>
+            <p>
+                The gate pass, packing slip, and invoice cannot
+                be generated until all outstanding requirements
+                have been resolved.
+            </p>
+        </div>
+
+        <div class="requirements-section">
+            <h3>Pending Requirements</h3>
+
+            {% if errors %}
+            <ul class="error-list">
+                {% for e in errors %}
+                <li>
+                    <span class="error-icon">!</span>
+                    <span>{{ e }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-errors">
+                No specific errors were provided. Please verify
+                the shipping clearance status.
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="interlock-footer">
+            <span class="status-dot"></span>
+            Dispatch authorization required
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

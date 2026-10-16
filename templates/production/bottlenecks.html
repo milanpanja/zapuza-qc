@@ -1,0 +1,104 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bottleneck-page">
+
+    <div class="bottleneck-header">
+        <div>
+            <span class="bottleneck-eyebrow">PRODUCTION ANALYTICS</span>
+            <h2>Production Bottlenecks</h2>
+            <p>Identify jobs waiting longest in the production queue.</p>
+        </div>
+
+        <div class="bottleneck-live">
+            <span class="live-dot"></span>
+            Queue Monitoring
+        </div>
+    </div>
+
+    <div class="bottleneck-info">
+        <div class="info-icon">⏱</div>
+        <div>
+            <strong>Longest queue time first</strong>
+            <p>Review idle time and cycle time to identify potential production delays.</p>
+        </div>
+    </div>
+
+    <div class="bottleneck-card">
+        <div class="bottleneck-card-header">
+            <div>
+                <h3>Queue Analysis</h3>
+                <p>Job-level machine waiting and processing information</p>
+            </div>
+
+            <span class="job-count">{{ rows|length }} Records</span>
+        </div>
+
+        <div class="bottleneck-table-wrap">
+            <table class="bottleneck-table">
+                <thead>
+                    <tr>
+                        <th>Job / Traveler</th>
+                        <th>Operation</th>
+                        <th>Machine</th>
+                        <th>Queue (Idle) Time</th>
+                        <th>Cycle Time</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for r in rows %}
+                    <tr>
+                        <td data-label="Job / Traveler">
+                            <strong class="job-name">{{ r.op.traveler }}</strong>
+                        </td>
+
+                        <td data-label="Operation">
+                            <span class="operation-name">{{ r.op }}</span>
+                        </td>
+
+                        <td data-label="Machine">
+                            <span class="machine-name">{{ r.op.machine }}</span>
+                        </td>
+
+                        <td data-label="Queue (Idle) Time">
+                            <span class="time-value
+                                {% if r.idle %}time-warning{% else %}time-neutral{% endif %}">
+                                {{ r.idle|default:"-" }}
+                            </span>
+                        </td>
+
+                        <td data-label="Cycle Time">
+                            {% if r.cycle %}
+                                <span class="cycle-value">{{ r.cycle }}</span>
+                            {% else %}
+                                <span class="running-status">
+                                    <span class="running-dot"></span>
+                                    Running
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="bottleneck-empty">
+                            <div class="empty-symbol">📊</div>
+                            <h3>No bottleneck records found</h3>
+                            <p>There are currently no records to display.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bottleneck-footer">
+            <span>Production Queue Overview</span>
+            <span>Review queue times to help prioritize work</span>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

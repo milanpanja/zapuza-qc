@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+{% block title %}Supervisor Approval Queue | Zapuza QC{% endblock %}
+
+{% block content %}
+<style>
+    .approval-page {
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 24px;
+        color: #1e293b;
+        font-family: Arial, sans-serif;
+    }
+
+    .approval-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .approval-header h2 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        line-height: 1.4;
+    }
+
+    .approval-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .queue-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px;
+        margin-bottom: 22px;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .queue-banner strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .queue-banner p {
+        margin: 0;
+    }
+
+    .queue-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .queue-toolbar h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .sort-controls {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .sort-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #334155;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .sort-link:hover,
+    .sort-link.active {
+        border-color: #2563eb;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .queue-panel {
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+    }
+
+    .queue-panel-header {
+        padding: 19px 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .queue-panel-header h3 {
+        margin: 0 0 5px;
+        font-size: 17px;
+    }
+
+    .queue-panel-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .approval-table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .approval-table th {
+        padding: 15px 17px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        white-space: nowrap;
+    }
+
+    .approval-table td {
+        padding: 16px 17px;
+        border-top: 1px solid #edf2f7;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .approval-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .approval-table tr.frozen-row {
+        background: #fff7f7;
+    }
+
+    .approval-table tr.frozen-row:hover {
+        background: #fef2f2;
+    }
+
+    .record-id {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 32px;
+        padding: 0 6px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 700;
+        box-sizing: border-box;
+    }
+
+    .job-name {
+        color: #0f172a;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .machine-name,
+    .inspector-name {
+        color: #475569;
+        overflow-wrap: anywhere;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 10px;
+        border-radius: 20px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-badge.frozen {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-badge.in-progress {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-badge.approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .review-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 15px;
+        border-radius: 8px;
+        background: #2563eb;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .review-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .review-btn:focus-visible,
+    .sort-link:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
+    .mobile-queue {
+        display: none;
+    }
+
+    .empty-state {
+        padding: 40px 20px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-state strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 16px;
+    }
+
+    @media (max-width: 800px) {
+        .approval-page {
+            padding: 16px;
+        }
+
+        .desktop-queue {
+            display: none;
+        }
+
+        .mobile-queue {
+            display: grid;
+            gap: 14px;
+            padding: 14px;
+        }
+
+        .approval-card {
+            padding: 17px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .approval-card.frozen-card {
+            border-color: #fecaca;
+            background: #fffafa;
+        }
+
+        .approval-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .approval-card-header h4 {
+            margin: 0 0 6px;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .approval-card-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .approval-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px 12px;
+            margin-bottom: 17px;
+        }
+
+        .detail-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .card-action {
+            padding-top: 14px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .card-action .review-btn {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .approval-page {
+            padding: 11px;
+        }
+
+        .approval-header h2 {
+            font-size: 22px;
+        }
+
+        .queue-banner {
+            padding: 13px;
+        }
+
+        .queue-toolbar {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .sort-controls {
+            width: 100%;
+        }
+
+        .sort-link {
+            flex: 1;
+        }
+
+        .approval-card {
+            padding: 14px;
+        }
+
+        .approval-card-header {
+            flex-direction: column;
+        }
+
+        .approval-details {
+            gap: 14px 8px;
+        }
+    }
+</style>
+
+<div class="approval-page">
+
+    <header class="approval-header">
+        <div>
+            <h2>Supervisor Approval Queue</h2>
+            <p>Review inspection records and manage quality approval decisions.</p>
+        </div>
+    </header>
+
+    <div class="queue-banner">
+        <span aria-hidden="true" style="font-size:22px;">✓</span>
+        <div>
+            <strong>Quality Review Center</strong>
+            <p>
+                Open an inspection to review its measurements, evidence,
+                and current status before making an authorized decision.
+            </p>
+        </div>
+    </div>
+
+    <div class="queue-toolbar">
+        <h3>Inspection Records</h3>
+        <div class="sort-controls">
+            <span>Sort by:</span>
+            <a class="sort-link" href="?sort=urgency">Urgency</a>
+            <a class="sort-link" href="?sort=machine">Machine</a>
+        </div>
+    </div>
+
+    <section class="queue-panel">
+        <div class="queue-panel-header">
+            <h3>Pending Quality Reviews</h3>
+            <p>Review each record before approving or taking further action.</p>
+        </div>
+
+        {% if items %}
+        <!-- Desktop table -->
+        <div class="desktop-queue">
+            <div class="table-scroll">
+                <table class="approval-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Job / Work Order</th>
+                            <th>Machine</th>
+                            <th>Inspector</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in items %}
+                        <tr class="{% if i.status == 'FROZEN' %}frozen-row{% endif %}">
+                            <td>
+                                <span class="record-id">{{ i.pk }}</span>
+                            </td>
+                            <td>
+                                <span class="job-name">{{ i.job }}</span>
+                            </td>
+                            <td>
+                                <span class="machine-name">{{ i.machine|default:"—" }}</span>
+                            </td>
+                            <td>
+                                <span class="inspector-name">{{ i.inspector|default:"—" }}</span>
+                            </td>
+                            <td>
+                                <span class="status-badge {% if i.status == 'FROZEN' %}frozen{% elif i.status == 'IN_PROGRESS' %}in-progress{% elif i.status == 'APPROVED' %}approved{% endif %}">
+                                    {{ i.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a class="review-btn" href="{% url 'review' i.pk %}">
+                                    Review
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Mobile cards -->
+        <div class="mobile-queue">
+            {% for i in items %}
+            <article class="approval-card {% if i.status == 'FROZEN' %}frozen-card{% endif %}">
+                <div class="approval-card-header">
+                    <div>
+                        <h4>{{ i.job }}</h4>
+                        <p>Inspection #{{ i.pk }}</p>
+                    </div>
+                    <span class="status-badge {% if i.status == 'FROZEN' %}frozen{% elif i.status == 'IN_PROGRESS' %}in-progress{% elif i.status == 'APPROVED' %}approved{% endif %}">
+                        {{ i.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="approval-details">
+                    <div>
+                        <span class="detail-label">Machine</span>
+                        <span class="detail-value">{{ i.machine|default:"—" }}</span>
+                    </div>
+                    <div>
+                        <span class="detail-label">Inspector</span>
+                        <span class="detail-value">{{ i.inspector|default:"—" }}</span>
+                    </div>
+                </div>
+
+                <div class="card-action">
+                    <a class="review-btn" href="{% url 'review' i.pk %}">
+                        Review Inspection →
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <strong>All caught up!</strong>
+            <p>There are no inspection records in this queue right now.</p>
+        </div>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

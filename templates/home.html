@@ -1,0 +1,369 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Zapuza QC{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 8px 0 28px;
+        color: var(--text, #172033);
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 26px;
+    }
+
+    .dashboard-header h1 {
+        margin: 0 0 6px;
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 800;
+        letter-spacing: -0.7px;
+    }
+
+    .dashboard-subtitle {
+        margin: 0;
+        color: var(--muted, #64748b);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .dashboard-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        border: 1px solid #bbf7d0;
+        border-radius: 999px;
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .dashboard-label::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+    }
+
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .stat-card {
+        position: relative;
+        overflow: hidden;
+        padding: 23px;
+        border: 1px solid var(--border, #e2e8f0);
+        border-radius: 18px;
+        background: var(--surface, #ffffff);
+        box-shadow: 0 5px 18px rgba(15, 23, 42, 0.045);
+        min-width: 0;
+    }
+
+    .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .stat-title {
+        color: var(--muted, #64748b);
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .stat-icon {
+        display: grid;
+        place-items: center;
+        width: 43px;
+        height: 43px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        font-size: 21px;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: clamp(30px, 4vw, 40px);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        overflow-wrap: anywhere;
+    }
+
+    .stat-caption {
+        margin-top: 10px;
+        color: var(--muted, #64748b);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .stat-approval { border-top: 4px solid #3b82f6; }
+    .stat-approval .stat-icon { background: #eff6ff; color: #2563eb; }
+
+    .stat-frozen { border-top: 4px solid #f97316; }
+    .stat-frozen .stat-icon { background: #fff7ed; color: #ea580c; }
+    .stat-frozen .stat-number { color: #ea580c; }
+
+    .stat-mrb { border-top: 4px solid #8b5cf6; }
+    .stat-mrb .stat-icon { background: #f5f3ff; color: #7c3aed; }
+
+    .dashboard-section {
+        margin-top: 30px;
+    }
+
+    .section-heading {
+        margin: 0 0 7px;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .section-description {
+        margin: 0 0 19px;
+        color: var(--muted, #64748b);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .action-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        padding: 20px;
+        border: 1px solid var(--border, #e2e8f0);
+        border-radius: 16px;
+        background: var(--surface, #ffffff);
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.035);
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+                    border-color 0.2s ease;
+    }
+
+    .action-card:hover {
+        transform: translateY(-3px);
+        border-color: #93c5fd;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    .action-icon {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 23px;
+    }
+
+    .action-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .action-content h3 {
+        margin: 0 0 5px;
+        font-size: 14px;
+        font-weight: 750;
+        line-height: 1.45;
+    }
+
+    .action-content p {
+        margin: 0;
+        color: var(--muted, #64748b);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .action-arrow {
+        flex-shrink: 0;
+        color: #94a3b8;
+        font-size: 21px;
+    }
+
+    @media (max-width: 900px) {
+        .dashboard-stats {
+            gap: 12px;
+        }
+
+        .stat-card {
+            padding: 18px;
+        }
+
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .action-card {
+            padding: 17px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .dashboard {
+            padding-top: 4px;
+        }
+
+        .dashboard-header {
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-label {
+            font-size: 11px;
+        }
+
+        .dashboard-stats {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 18px;
+        }
+
+        .stat-top {
+            margin-bottom: 12px;
+        }
+
+        .stat-number {
+            font-size: 34px;
+        }
+
+        .dashboard-section {
+            margin-top: 24px;
+        }
+
+        .section-heading {
+            font-size: 18px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .action-card {
+            transition: none;
+        }
+    }
+</style>
+
+<div class="dashboard">
+
+    <!-- Dashboard heading -->
+    <header class="dashboard-header">
+        <div>
+            <h1>Quality Dashboard</h1>
+            <p class="dashboard-subtitle">
+                Monitor inspections, quality holds, and approval activities.
+            </p>
+        </div>
+
+        <div class="dashboard-label">Quality Control Center</div>
+    </header>
+
+    <!-- Quality summary cards -->
+    <section class="dashboard-stats" aria-label="Quality summary">
+
+        <article class="stat-card stat-approval">
+            <div class="stat-top">
+                <span class="stat-title">Awaiting Approval</span>
+                <span class="stat-icon" aria-hidden="true">📋</span>
+            </div>
+            <strong class="stat-number">{{ awaiting }}</strong>
+            <p class="stat-caption">
+                Inspections waiting for supervisor review
+            </p>
+        </article>
+
+        <article class="stat-card stat-frozen">
+            <div class="stat-top">
+                <span class="stat-title">CTQ Frozen</span>
+                <span class="stat-icon" aria-hidden="true">⚠️</span>
+            </div>
+            <strong class="stat-number">{{ frozen }}</strong>
+            <p class="stat-caption">
+                Quality-critical inspections requiring attention
+            </p>
+        </article>
+
+        <article class="stat-card stat-mrb">
+            <div class="stat-top">
+                <span class="stat-title">Waiting for MRB</span>
+                <span class="stat-icon" aria-hidden="true">🛡️</span>
+            </div>
+            <strong class="stat-number">{{ quarantined }}</strong>
+            <p class="stat-caption">
+                Quarantined items awaiting material review
+            </p>
+        </article>
+
+    </section>
+
+    <!-- Quick navigation -->
+    <section class="dashboard-section">
+        <h2 class="section-heading">Quick Actions</h2>
+        <p class="section-description">
+            Choose a workflow to continue your quality operations.
+        </p>
+
+        <div class="quick-actions">
+
+            <a class="action-card" href="{% url 'scan' %}">
+                <span class="action-icon" aria-hidden="true">▦</span>
+                <span class="action-content">
+                    <h3>Start Inspection</h3>
+                    <p>Scan a machine or job QR code to begin.</p>
+                </span>
+                <span class="action-arrow" aria-hidden="true">›</span>
+            </a>
+
+            <a class="action-card" href="{% url 'queue' %}">
+                <span class="action-icon" aria-hidden="true">✓</span>
+                <span class="action-content">
+                    <h3>Supervisor Queue</h3>
+                    <p>Review inspections awaiting approval.</p>
+                </span>
+                <span class="action-arrow" aria-hidden="true">›</span>
+            </a>
+
+            <a class="action-card" href="{% url 'trav_list' %}">
+                <span class="action-icon" aria-hidden="true">▤</span>
+                <span class="action-content">
+                    <h3>Job Travelers</h3>
+                    <p>Track work orders and production operations.</p>
+                </span>
+                <span class="action-arrow" aria-hidden="true">›</span>
+            </a>
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}

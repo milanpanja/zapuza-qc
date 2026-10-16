@@ -1,0 +1,150 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lots-page">
+
+    <div class="lots-header">
+        <div>
+            <span class="lots-eyebrow">INVENTORY MANAGEMENT</span>
+            <h2>Raw Material Lots</h2>
+            <p>Manage material traceability, inspection status, and supplier documents.</p>
+        </div>
+
+        <a class="lots-primary-btn" href="{% url 'lot_new' %}">
+            <span>+</span> New Intake
+        </a>
+    </div>
+
+    <div class="lots-card">
+        <div class="lots-card-header">
+            <div>
+                <h3>Material Inventory</h3>
+                <p>Review incoming raw material batches and take action.</p>
+            </div>
+            <span class="lots-count">
+                {{ lots|length }} Lots
+            </span>
+        </div>
+
+        <div class="lots-table-wrap">
+            <table class="lots-table">
+                <thead>
+                    <tr>
+                        <th>Heat Number</th>
+                        <th>Supplier / PO</th>
+                        <th>Grade</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for l in lots %}
+                    <tr>
+                        <td data-label="Heat Number">
+                            <strong class="heat-number">{{ l.heat_number }}</strong>
+                        </td>
+
+                        <td data-label="Supplier / PO">
+                            <div class="supplier-name">{{ l.supplier }}</div>
+                            <span class="po-number">PO: {{ l.po_number }}</span>
+                        </td>
+
+                        <td data-label="Grade">
+                            <span class="grade-tag">{{ l.grade }}</span>
+                        </td>
+
+                        <td data-label="Quantity">
+                            <strong>{{ l.quantity }}</strong>
+                        </td>
+
+                        <td data-label="Status">
+                            <span class="lot-status
+                                {% if l.status == 'OK' %}status-ok
+                                {% elif l.status == 'QUAR' %}status-quar
+                                {% elif l.status == 'LAB' %}status-lab
+                                {% else %}status-other{% endif %}">
+                                {{ l.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td data-label="Actions">
+                            <div class="lot-actions">
+
+                                {% if l.mtc_file %}
+                                <a class="lot-action-btn action-document"
+                                   href="{{ l.mtc_file.url }}"
+                                   target="_blank" rel="noopener">
+                                    View MTC
+                                </a>
+                                {% else %}
+                                <span class="missing-document">No MTC</span>
+                                {% endif %}
+
+                                <a class="lot-action-btn action-label"
+                                   href="{% url 'lot_label' l.pk %}"
+                                   target="_blank" rel="noopener">
+                                    Label
+                                </a>
+
+                                {% if l.status == 'LAB' %}
+                                <form method="post"
+                                      action="{% url 'lot_clear' l.pk %}"
+                                      class="lot-inline-form"
+                                      onsubmit="return confirm('Confirm that this material lot has passed inspection and can be cleared?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="lot-action-btn action-clear">
+                                        Clear
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if l.status != 'QUAR' %}
+                                <form method="post"
+                                      action="{% url 'lot_reject' l.pk %}"
+                                      class="lot-reject-form"
+                                      onsubmit="return confirm('Are you sure you want to reject this material lot?');">
+                                    {% csrf_token %}
+                                    <input
+                                        type="text"
+                                        name="reason"
+                                        placeholder="Enter rejection reason"
+                                        aria-label="Rejection reason for {{ l.heat_number }}"
+                                        required
+                                    >
+                                    <button type="submit" class="lot-action-btn action-reject">
+                                        Reject
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="lots-empty">
+                            <div class="empty-icon">📦</div>
+                            <h3>No raw material lots found</h3>
+                            <p>Add a new material intake to get started.</p>
+                            <a class="lots-primary-btn" href="{% url 'lot_new' %}">
+                                + New Intake
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="lots-footer">
+            <span>Material traceability and quality control</span>
+            <span>Raw Material Inventory</span>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

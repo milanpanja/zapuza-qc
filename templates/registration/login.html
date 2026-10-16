@@ -1,0 +1,31 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <div class="login-icon">🔐</div>
+
+        <h2>Welcome Back!</h2>
+        <p class="login-subtitle">
+            Please log in to your account
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="login-btn">
+                Login to Account
+            </button>
+        </form>
+
+        <div class="login-footer">
+            Secure Login · Welcome Back
+        </div>
+
+    </div>
+</div>
+{% endblock %}

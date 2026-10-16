@@ -1,0 +1,639 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .review-page {
+        max-width: 1350px;
+        margin: 0 auto;
+        padding: 24px;
+        color: #1e293b;
+        font-family: Arial, sans-serif;
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .review-header h2 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    .review-subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 20px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-frozen {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .review-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px;
+        margin-bottom: 22px;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .review-banner strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .review-banner p {
+        margin: 0;
+    }
+
+    .review-section {
+        margin-bottom: 24px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+
+    .section-header h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .section-header p {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+    }
+
+    .review-table {
+        width: 100%;
+        min-width: 850px;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .review-table th {
+        padding: 14px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        white-space: nowrap;
+    }
+
+    .review-table td {
+        padding: 15px 14px;
+        border-top: 1px solid #e2e8f0;
+        font-size: 13px;
+        vertical-align: middle;
+        overflow-wrap: anywhere;
+    }
+
+    .review-table tr.passed-row {
+        background: #f7fef9;
+    }
+
+    .review-table tr.failed-row {
+        background: #fff7f7;
+    }
+
+    .review-table tr.ctq-row {
+        box-shadow: inset 4px 0 #ea580c;
+    }
+
+    .pin-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 32px;
+        padding: 0 6px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        font-weight: 700;
+        box-sizing: border-box;
+    }
+
+    .characteristic {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .ctq-badge {
+        display: inline-block;
+        margin: 5px 0 0 4px;
+        padding: 4px 7px;
+        border-radius: 5px;
+        background: #ffedd5;
+        color: #9a3412;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .result-badge {
+        display: inline-block;
+        padding: 6px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .result-pass {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .result-fail {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .photo-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    .photo-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 10px;
+        border: 1px solid #bfdbfe;
+        border-radius: 7px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .photo-link:hover {
+        background: #dbeafe;
+    }
+
+    .muted {
+        color: #94a3b8;
+    }
+
+    .decision-section h3,
+    .concession-section h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+    }
+
+    .section-description {
+        margin: 0 0 18px;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .decision-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+    }
+
+    .decision-card {
+        padding: 18px;
+        border: 1px solid #e2e8f0;
+        border-radius: 11px;
+        background: #f8fafc;
+    }
+
+    .decision-card h4 {
+        margin: 0 0 7px;
+        font-size: 15px;
+    }
+
+    .decision-card p {
+        margin: 0 0 16px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .decision-card.approve {
+        border-top: 4px solid #16a34a;
+    }
+
+    .decision-card.reject {
+        border-top: 4px solid #dc2626;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 43px;
+        padding: 11px 15px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: #fff;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    .btn-green {
+        background: #15803d;
+    }
+
+    .btn-green:hover {
+        background: #166534;
+    }
+
+    .btn-danger {
+        background: #b91c1c;
+    }
+
+    .btn-danger:hover {
+        background: #991b1b;
+    }
+
+    .btn-orange {
+        background: #c2410c;
+    }
+
+    .btn-orange:hover {
+        background: #9a3412;
+    }
+
+    .btn:focus-visible,
+    .photo-link:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
+    .concession-section {
+        border-top: 4px solid #d97706;
+        background: #fffbeb;
+    }
+
+    .concession-warning {
+        padding: 12px 14px;
+        margin-bottom: 18px;
+        border: 1px solid #fde68a;
+        border-radius: 9px;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        min-height: 43px;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #0f172a;
+        font-family: inherit;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #d97706;
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, .12);
+    }
+
+    textarea.form-control {
+        min-height: 110px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .empty-state {
+        padding: 28px 16px;
+        color: #64748b;
+        text-align: center;
+    }
+
+    @media (max-width: 760px) {
+        .review-page {
+            padding: 16px;
+        }
+
+        .review-section {
+            padding: 16px;
+        }
+
+        .decision-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .review-page {
+            padding: 11px;
+        }
+
+        .review-header h2 {
+            font-size: 21px;
+        }
+
+        .review-section {
+            padding: 13px;
+        }
+
+        .review-banner {
+            padding: 13px;
+        }
+
+        .section-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .decision-card {
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="review-page">
+
+    <!-- Header -->
+    <header class="review-header">
+        <div>
+            <h2>Inspection Review</h2>
+            <p class="review-subtitle">
+                Review reference: {{ insp }}
+                <br>
+                Verify measurements, gauge details, and supporting evidence.
+            </p>
+        </div>
+
+        <span class="status-badge
+            {% if insp.status == 'FROZEN' %}status-frozen{% endif %}">
+            {{ insp.get_status_display }}
+        </span>
+    </header>
+
+    <div class="review-banner">
+        <span aria-hidden="true" style="font-size:22px;">✓</span>
+        <div>
+            <strong>Supervisor Quality Review</strong>
+            <p>
+                Check each recorded characteristic and any attached evidence
+                before selecting an authorized disposition.
+            </p>
+        </div>
+    </div>
+
+    <!-- Measurement Review -->
+    <section class="review-section">
+        <div class="section-header">
+            <div>
+                <h3>Measurement Details</h3>
+                <p>Inspection characteristics and recorded results</p>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            <table class="review-table">
+                <thead>
+                    <tr>
+                        <th>Pin</th>
+                        <th>Characteristic</th>
+                        <th>Specification</th>
+                        <th>Value</th>
+                        <th>Gauge</th>
+                        <th>Result</th>
+                        <th>Photo Evidence</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for m in measurements %}
+                    <tr class="
+                        {% if m.passed %}passed-row{% else %}failed-row{% endif %}
+                        {% if m.field.is_ctq %}ctq-row{% endif %}">
+
+                        <td>
+                            <span class="pin-number">
+                                {{ m.field.pin_number }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="characteristic">
+                                {{ m.field.label }}
+                            </span>
+                            {% if m.field.is_ctq %}
+                                <br>
+                                <span class="ctq-badge">CTQ</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ m.field.spec_text }}</td>
+
+                        <td><strong>{{ m.value }}</strong></td>
+
+                        <td>{{ m.gauge|default:"—" }}</td>
+
+                        <td>
+                            {% if m.passed %}
+                                <span class="result-badge result-pass">PASS</span>
+                            {% else %}
+                                <span class="result-badge result-fail">FAIL</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="photo-links">
+                                {% for p in m.photos.all %}
+                                    <a class="photo-link"
+                                       href="{{ p.image.url }}"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        Photo {{ forloop.counter }} ↗
+                                    </a>
+                                {% empty %}
+                                    <span class="muted">No photos</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                No measurement records are available.
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Supervisor Decisions -->
+    <section class="review-section decision-section">
+        <h3>Supervisor Decision</h3>
+        <p class="section-description">
+            Select the appropriate action after reviewing the inspection
+            results and applicable quality requirements.
+        </p>
+
+        <div class="decision-grid">
+
+            <div class="decision-card approve">
+                <h4>Approve Inspection</h4>
+                <p>
+                    Approve only when all required checks and approval
+                    conditions have been satisfied.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="approve">
+                    <button type="submit" class="btn btn-green">
+                        ✓ Approve
+                    </button>
+                </form>
+            </div>
+
+            <div class="decision-card reject">
+                <h4>Quarantine / Reject</h4>
+                <p>
+                    Keep affected material on hold pending the required
+                    nonconformance disposition.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="quarantine">
+                    <button type="submit" class="btn btn-danger">
+                        Quarantine / Reject
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Conditional Concession -->
+    <section class="review-section concession-section">
+        <h3>Conditional Concession</h3>
+        <p class="section-description">
+            Submit an engineering justification for review when a concession
+            is permitted by your quality procedure.
+        </p>
+
+        <div class="concession-warning">
+            <strong>Important:</strong>
+            Concessions are intended for eligible non-CTQ characteristics only.
+            A concession must not bypass required customer approval or other
+            mandatory quality controls.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="concession">
+
+            <div class="form-group">
+                <label class="form-label" for="reason-code">
+                    Reason Code
+                </label>
+                <input
+                    type="text"
+                    name="reason_code"
+                    id="reason-code"
+                    class="form-control"
+                    placeholder="Enter reason code"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="justification">
+                    Engineering Justification
+                </label>
+                <textarea
+                    name="justification"
+                    id="justification"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Explain the technical justification and proposed disposition..."
+                    required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-orange">
+                Submit Concession Request
+            </button>
+        </form>
+    </section>
+
+</div>
+
+{% endblock %}

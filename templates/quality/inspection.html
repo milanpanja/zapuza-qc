@@ -1,0 +1,663 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .inspection-page {
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 24px;
+        color: #1e293b;
+        font-family: Arial, sans-serif;
+    }
+
+    .inspection-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .inspection-header h2 {
+        margin: 0 0 10px;
+        font-size: 26px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    .inspection-subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .inspection-subtitle a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .inspection-subtitle a:hover {
+        text-decoration: underline;
+    }
+
+    .inspection-status {
+        display: inline-block;
+        padding: 8px 13px;
+        border-radius: 20px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .inspection-status.frozen {
+        background: #fff1f2;
+        color: #be123c;
+    }
+
+    .inspection-status.complete {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .inspection-summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 18px;
+        margin-bottom: 22px;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .inspection-summary strong {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 14px;
+    }
+
+    .inspection-summary p {
+        margin: 0;
+    }
+
+    .inspection-card {
+        margin-bottom: 16px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #94a3b8;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, .04);
+        overflow-wrap: anywhere;
+    }
+
+    .inspection-card.passed {
+        border-left-color: #16a34a;
+    }
+
+    .inspection-card.failed {
+        border-left-color: #dc2626;
+    }
+
+    .inspection-card.ctq {
+        border-left-color: #ea580c;
+        background: #fffaf5;
+    }
+
+    .measurement-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+
+    .measurement-title {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .measurement-label {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .ctq-badge {
+        display: inline-block;
+        margin-left: 5px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: #ffedd5;
+        color: #9a3412;
+        font-size: 10px;
+        font-weight: 800;
+        vertical-align: middle;
+    }
+
+    .result-badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .result-badge.pass {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .result-badge.fail {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .measurement-details {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .detail-box {
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        background: #f8fafc;
+        min-width: 0;
+    }
+
+    .detail-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .detail-value {
+        color: #0f172a;
+        font-size: 14px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .photo-section {
+        margin-top: 17px;
+        padding-top: 16px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .photo-count {
+        margin: 0 0 12px;
+        color: #b91c1c;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .inspection-form {
+        display: flex;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .form-group {
+        flex: 1 1 200px;
+        min-width: 0;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        min-height: 43px;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #0f172a;
+        font: inherit;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    input[type="file"].form-control {
+        padding: 8px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    .btn:hover {
+        filter: brightness(.94);
+    }
+
+    .btn-green {
+        background: #15803d;
+    }
+
+    .btn-orange {
+        background: #c2410c;
+    }
+
+    .btn:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
+    .frozen-alert {
+        margin-bottom: 20px;
+        padding: 18px;
+        border: 1px solid #fecaca;
+        border-left: 5px solid #dc2626;
+        border-radius: 12px;
+        background: #fef2f2;
+        color: #991b1b;
+        line-height: 1.7;
+    }
+
+    .frozen-alert strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 15px;
+    }
+
+    .frozen-alert p {
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .entry-card {
+        margin-top: 25px;
+        padding: 22px;
+        border: 1px solid #bfdbfe;
+        border-radius: 14px;
+        background: #f8fbff;
+    }
+
+    .entry-card.ctq {
+        border-color: #fed7aa;
+        background: #fffaf5;
+    }
+
+    .entry-card h3 {
+        margin: 0 0 8px;
+        font-size: 19px;
+        line-height: 1.5;
+    }
+
+    .entry-spec {
+        margin: 0 0 18px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .entry-form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .entry-form .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .entry-form .btn {
+        justify-self: start;
+    }
+
+    .complete-section {
+        margin-top: 22px;
+        padding: 20px;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        background: #f0fdf4;
+    }
+
+    .complete-section h3 {
+        margin: 0 0 7px;
+        color: #166534;
+        font-size: 17px;
+    }
+
+    .complete-section p {
+        margin: 0 0 16px;
+        color: #166534;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 760px) {
+        .inspection-page {
+            padding: 16px;
+        }
+
+        .inspection-header h2 {
+            font-size: 22px;
+        }
+
+        .inspection-card {
+            padding: 16px;
+        }
+
+        .measurement-details {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .inspection-form {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .inspection-form .form-group,
+        .inspection-form .btn {
+            width: 100%;
+            flex-basis: auto;
+        }
+
+        .entry-card {
+            padding: 17px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .inspection-page {
+            padding: 11px;
+        }
+
+        .inspection-header {
+            gap: 10px;
+        }
+
+        .inspection-header h2 {
+            font-size: 20px;
+        }
+
+        .inspection-summary {
+            padding: 13px;
+        }
+
+        .measurement-details {
+            grid-template-columns: 1fr;
+        }
+
+        .measurement-header {
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .entry-form {
+            grid-template-columns: 1fr;
+        }
+
+        .entry-form .full-width {
+            grid-column: auto;
+        }
+
+        .entry-form .btn {
+            width: 100%;
+            justify-self: stretch;
+        }
+
+        .complete-section .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="inspection-page">
+
+    <!-- Header -->
+    <div class="inspection-header">
+        <div>
+            <h2>{{ insp }}</h2>
+            <p class="inspection-subtitle">
+                Machine: {{ insp.machine }}
+                <br>
+                Template: {{ insp.template }}
+                {% if insp.template.drawing %}
+                    | <a href="{{ insp.template.drawing.url }}"
+                         target="_blank"
+                         rel="noopener noreferrer">Open drawing ↗</a>
+                {% endif %}
+            </p>
+        </div>
+
+        <span class="inspection-status
+            {% if insp.status == 'FROZEN' %}frozen
+            {% elif insp.status == 'COMPLETED' %}complete
+            {% endif %}">
+            {{ insp.get_status_display }}
+        </span>
+    </div>
+
+    <div class="inspection-summary">
+        <div aria-hidden="true" style="font-size:25px;">✓</div>
+        <div>
+            <strong>Quality Inspection Checklist</strong>
+            <p>Review recorded measurements and complete any required inspection evidence.</p>
+        </div>
+    </div>
+
+    <!-- Frozen Checklist Alert -->
+    {% if insp.status == 'FROZEN' %}
+    <div class="frozen-alert" role="alert">
+        <strong>⚠ CHECKLIST FROZEN — CTQ OUT OF TOLERANCE</strong>
+        Quality Head alerted. Supervisor must quarantine the affected material
+        according to your quality procedure.
+    </div>
+    {% endif %}
+
+    <!-- Recorded Measurements -->
+    {% for m in measurements %}
+    <div class="inspection-card
+        {% if m.field.is_ctq %}ctq
+        {% elif m.passed %}passed
+        {% else %}failed
+        {% endif %}">
+
+        <div class="measurement-header">
+            <h3 class="measurement-title">
+                <span class="measurement-label">
+                    #{{ m.field.pin_number }} {{ m.field.label }}
+                </span>
+
+                {% if m.field.is_ctq %}
+                    <span class="ctq-badge">CTQ</span>
+                {% endif %}
+            </h3>
+
+            {% if m.passed %}
+                <span class="result-badge pass">✓ PASS</span>
+            {% else %}
+                <span class="result-badge fail">✕ FAIL</span>
+            {% endif %}
+        </div>
+
+        <div class="measurement-details">
+            <div class="detail-box">
+                <span class="detail-label">Specification</span>
+                <div class="detail-value">{{ m.field.spec_text }}</div>
+            </div>
+
+            <div class="detail-box">
+                <span class="detail-label">Measured Value</span>
+                <div class="detail-value">{{ m.value }}</div>
+            </div>
+
+            <div class="detail-box">
+                <span class="detail-label">Gauge</span>
+                <div class="detail-value">{{ m.gauge|default:"—" }}</div>
+            </div>
+        </div>
+
+        {% if not m.passed %}
+        <div class="photo-section">
+            <p class="photo-count">
+                Photo evidence: {{ m.photos.count }}/2 required
+            </p>
+
+            {% if insp.status == 'IN_PROGRESS' or insp.status == 'FROZEN' %}
+            <form method="post"
+                  enctype="multipart/form-data"
+                  class="inspection-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="photo">
+                <input type="hidden" name="measurement" value="{{ m.pk }}">
+
+                <div class="form-group">
+                    <label class="form-label" for="photo-{{ m.pk }}">
+                        Upload inspection photos
+                    </label>
+                    <input
+                        class="form-control"
+                        type="file"
+                        id="photo-{{ m.pk }}"
+                        name="image"
+                        accept="image/*"
+                        capture="environment"
+                        multiple
+                        required>
+                </div>
+
+                <button type="submit" class="btn">
+                    Upload Photos
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+    {% empty %}
+    <div class="inspection-card">
+        No measurements are available for this inspection.
+    </div>
+    {% endfor %}
+
+    <!-- Next Measurement Entry -->
+    {% if next %}
+    <div class="entry-card {% if next.is_ctq %}ctq{% endif %}">
+        <h3>
+            Next Inspection: #{{ next.pin_number }} {{ next.label }}
+            {% if next.is_ctq %}
+                <span class="ctq-badge">CTQ</span>
+            {% endif %}
+        </h3>
+
+        <p class="entry-spec">
+            <strong>Specification:</strong> {{ next.spec_text }}
+        </p>
+
+        <form method="post" id="mform" class="entry-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="measure">
+            <input type="hidden" name="field" value="{{ next.pk }}">
+
+            {% if next.kind == 'PF' %}
+            <div class="full-width">
+                <label class="form-label" for="pf-value">
+                    Inspection Result
+                </label>
+                <select name="value" id="pf-value" class="form-control" required>
+                    <option value="1">PASS</option>
+                    <option value="0">FAIL</option>
+                </select>
+            </div>
+            {% else %}
+            <div>
+                <label class="form-label" for="val">
+                    Measured Value
+                </label>
+                <input
+                    name="value"
+                    id="val"
+                    type="number"
+                    step="any"
+                    class="form-control"
+                    placeholder="Enter measured value"
+                    required>
+            </div>
+
+            <div>
+                <label class="form-label" for="gauge">
+                    Gauge Serial Number
+                </label>
+                <input
+                    name="gauge"
+                    id="gauge"
+                    class="form-control"
+                    placeholder="e.g. VC-104"
+                    required>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-green full-width">
+                Save Measurement
+            </button>
+        </form>
+    </div>
+
+    {% elif insp.status == 'IN_PROGRESS' %}
+    <!-- Completion -->
+    <div class="complete-section">
+        <h3>Inspection Data Entry Finished?</h3>
+        <p>
+            Submit the checklist for supervisor review after all required
+            measurements and evidence have been verified.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="complete">
+            <button type="submit" class="btn btn-green">
+                Complete &amp; Send to Supervisor
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,636 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .traveler-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+        color: #1e293b;
+        font-family: Arial, sans-serif;
+    }
+
+    .traveler-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .traveler-header h2 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .traveler-subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .traveler-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+
+    .traveler-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .info-label {
+        display: block;
+        margin-bottom: 6px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 20px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .qr-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        text-decoration: none;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 700;
+        border: 1px solid #bfdbfe;
+    }
+
+    .qr-link:hover {
+        background: #dbeafe;
+    }
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .section-heading h3 {
+        margin: 0;
+        font-size: 19px;
+    }
+
+    .operation-count {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+    .operation-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+        background: #fff;
+    }
+
+    .operation-table th {
+        padding: 14px 16px;
+        background: #f8fafc;
+        color: #475569;
+        text-align: left;
+        white-space: nowrap;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .operation-table td {
+        padding: 16px;
+        border-top: 1px solid #e2e8f0;
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    .operation-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .op-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: #f1f5f9;
+        font-weight: 700;
+    }
+
+    .op-name {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .muted {
+        color: #94a3b8;
+    }
+
+    .hold-badge {
+        display: inline-block;
+        padding: 6px 9px;
+        border-radius: 7px;
+        background: #fff1f2;
+        color: #be123c;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .hold-normal {
+        color: #475569;
+        font-size: 12px;
+    }
+
+    .action-cell {
+        min-width: 190px;
+    }
+
+    .action-form {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .machine-input {
+        width: 100%;
+        max-width: 180px;
+        min-width: 0;
+        padding: 10px 11px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 13px;
+        box-sizing: border-box;
+    }
+
+    .machine-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 13px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .btn:hover {
+        filter: brightness(.94);
+    }
+
+    .btn-green {
+        background: #15803d;
+    }
+
+    .btn-outline {
+        background: #fff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+    }
+
+    .btn:focus-visible,
+    .qr-link:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
+    .mobile-operations {
+        display: none;
+    }
+
+    @media (max-width: 900px) {
+        .traveler-page {
+            padding: 16px;
+        }
+
+        .desktop-operations {
+            display: none;
+        }
+
+        .mobile-operations {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .operation-card {
+            padding: 17px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .operation-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .operation-card-top h4 {
+            margin: 0 0 5px;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .operation-card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px 12px;
+            margin-bottom: 16px;
+        }
+
+        .mobile-actions {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 14px;
+        }
+
+        .mobile-actions .action-form {
+            align-items: stretch;
+        }
+
+        .mobile-actions .machine-input {
+            max-width: none;
+            flex: 1 1 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .traveler-page {
+            padding: 12px;
+        }
+
+        .traveler-header h2 {
+            font-size: 21px;
+        }
+
+        .traveler-card {
+            padding: 15px;
+        }
+
+        .traveler-info {
+            align-items: flex-start;
+        }
+
+        .qr-link {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .operation-card-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 8px;
+        }
+
+        .info-value {
+            font-size: 14px;
+        }
+
+        .mobile-actions .action-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .mobile-actions .machine-input,
+        .mobile-actions .btn {
+            width: 100%;
+            max-width: none;
+            box-sizing: border-box;
+        }
+    }
+</style>
+
+<div class="traveler-page">
+
+    <!-- Page Header -->
+    <div class="traveler-header">
+        <div>
+            <h2>Production Traveler</h2>
+            <p class="traveler-subtitle">
+                Work order: {{ t.work_order }} · Part: {{ t.part }}
+            </p>
+        </div>
+
+        <span class="status-badge">
+            {{ t.get_status_display }}
+        </span>
+    </div>
+
+    <!-- Work Order Information -->
+    <div class="traveler-card">
+        <div class="traveler-info">
+            <div>
+                <span class="info-label">Work Order</span>
+                <div class="info-value">{{ t.work_order }}</div>
+            </div>
+
+            <div>
+                <span class="info-label">Part Number</span>
+                <div class="info-value">{{ t.part }}</div>
+            </div>
+
+            <div>
+                <span class="info-label">Raw Material Heat Lot</span>
+                <div class="info-value">
+                    {{ t.raw_lot.heat_number|default:"Not assigned" }}
+                </div>
+            </div>
+
+            <a href="{% url 'trav_qr' t.pk %}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="qr-link">
+                <span aria-hidden="true">▦</span>
+                View Traveler QR
+            </a>
+        </div>
+    </div>
+
+    <!-- Operations -->
+    <div class="traveler-card">
+        <div class="section-heading">
+            <h3>Operation Tracking</h3>
+            <span class="operation-count">
+                Production steps and progress
+            </span>
+        </div>
+
+        <!-- Desktop and Tablet Table -->
+        <div class="desktop-operations">
+            <div class="table-wrapper">
+                <table class="operation-table">
+                    <thead>
+                        <tr>
+                            <th>Op</th>
+                            <th>Operation Name</th>
+                            <th>Operator / Machine</th>
+                            <th>Started</th>
+                            <th>Finished</th>
+                            <th>Hold</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for o, hold in ops %}
+                        <tr>
+                            <td>
+                                <span class="op-number">{{ o.seq }}</span>
+                            </td>
+
+                            <td>
+                                <span class="op-name">{{ o.name }}</span>
+                            </td>
+
+                            <td>
+                                {{ o.operator|default:"—" }}
+                                <br>
+                                <span class="muted">
+                                    {{ o.machine|default:"No machine" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ o.started_at|date:"d M Y, H:i"|default:"—" }}
+                            </td>
+
+                            <td>
+                                {{ o.finished_at|date:"d M Y, H:i"|default:"—" }}
+                            </td>
+
+                            <td>
+                                {% if hold %}
+                                    <span class="hold-badge">
+                                        {{ hold }} left
+                                    </span>
+                                {% elif o.hold_minutes %}
+                                    <span class="hold-normal">
+                                        {{ o.hold_minutes }} min
+                                    </span>
+                                {% else %}
+                                    <span class="muted">—</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="action-cell">
+                                {% if not o.started_at %}
+                                    <form method="post"
+                                          action="{% url 'op_start' o.pk %}"
+                                          class="action-form">
+                                        {% csrf_token %}
+                                        <input
+                                            class="machine-input"
+                                            name="machine_qr"
+                                            placeholder="Scan machine QR"
+                                            aria-label="Machine QR for operation {{ o.seq }}"
+                                            required>
+                                        <button type="submit" class="btn">
+                                            Start
+                                        </button>
+                                    </form>
+
+                                {% elif not o.finished_at %}
+                                    <form method="post"
+                                          action="{% url 'op_finish' o.pk %}"
+                                          class="action-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-green">
+                                            Finish
+                                        </button>
+                                    </form>
+
+                                    {% if o.run %}
+                                        <p>
+                                            <a class="btn btn-outline"
+                                               href="{% url 'run_detail' o.run.pk %}">
+                                                View Run
+                                            </a>
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="status-badge">Completed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:30px;">
+                                No operations are available for this work order.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Mobile Operation Cards -->
+        <div class="mobile-operations">
+            {% for o, hold in ops %}
+            <div class="operation-card">
+                <div class="operation-card-top">
+                    <div>
+                        <h4>{{ o.name }}</h4>
+                        <span class="muted">Operation #{{ o.seq }}</span>
+                    </div>
+
+                    {% if o.finished_at %}
+                        <span class="status-badge">Completed</span>
+                    {% elif o.started_at %}
+                        <span class="status-badge">In Progress</span>
+                    {% else %}
+                        <span class="status-badge">Not Started</span>
+                    {% endif %}
+                </div>
+
+                <div class="operation-card-grid">
+                    <div>
+                        <span class="info-label">Operator</span>
+                        <div class="info-value">
+                            {{ o.operator|default:"—" }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="info-label">Machine</span>
+                        <div class="info-value">
+                            {{ o.machine|default:"Not assigned" }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="info-label">Started</span>
+                        <div class="info-value">
+                            {{ o.started_at|date:"d M, H:i"|default:"—" }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="info-label">Finished</span>
+                        <div class="info-value">
+                            {{ o.finished_at|date:"d M, H:i"|default:"—" }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="info-label">Hold</span>
+                        <div class="info-value">
+                            {% if hold %}
+                                <span class="hold-badge">{{ hold }} left</span>
+                            {% elif o.hold_minutes %}
+                                {{ o.hold_minutes }} min
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mobile-actions">
+                    {% if not o.started_at %}
+                        <form method="post"
+                              action="{% url 'op_start' o.pk %}"
+                              class="action-form">
+                            {% csrf_token %}
+                            <input
+                                class="machine-input"
+                                name="machine_qr"
+                                placeholder="Scan machine QR"
+                                aria-label="Machine QR for operation {{ o.seq }}"
+                                required>
+                            <button type="submit" class="btn">
+                                Start Operation
+                            </button>
+                        </form>
+
+                    {% elif not o.finished_at %}
+                        <form method="post"
+                              action="{% url 'op_finish' o.pk %}"
+                              class="action-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-green">
+                                Finish Operation
+                            </button>
+                        </form>
+
+                        {% if o.run %}
+                            <p>
+                                <a class="btn btn-outline"
+                                   href="{% url 'run_detail' o.run.pk %}">
+                                    View Production Run
+                                </a>
+                            </p>
+                        {% endif %}
+                    {% else %}
+                        <span class="status-badge">Operation Completed</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="operation-card">
+                No operations are available for this work order.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

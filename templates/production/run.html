@@ -1,0 +1,139 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="production-page">
+
+    <div class="production-header">
+        <div>
+            <span class="production-eyebrow">MANUFACTURING CONTROL</span>
+            <h2>Production Run</h2>
+            <p class="production-operation">
+                Operation: <strong>{{ run.operation }}</strong>
+            </p>
+        </div>
+
+        <div class="production-run-badge">
+            Production Monitoring
+        </div>
+    </div>
+
+    <!-- First Piece Approval Status -->
+    <div class="production-status-card
+        {% if run.first_piece_approved %}production-approved
+        {% else %}production-setup{% endif %}">
+
+        <div class="production-status-icon">
+            {% if run.first_piece_approved %}✓{% else %}!{% endif %}
+        </div>
+
+        <div class="production-status-content">
+            {% if run.first_piece_approved %}
+                <h3>First Piece Approved</h3>
+                <p>First-piece approval is recorded. Production counting is available.</p>
+            {% else %}
+                <h3>Setup Mode</h3>
+                <p>The first piece has not been approved. Obtain QA approval before continuing production.</p>
+            {% endif %}
+        </div>
+
+        <span class="production-status-label">
+            {% if run.first_piece_approved %}APPROVED{% else %}PENDING QA{% endif %}
+        </span>
+    </div>
+
+    <!-- Production Counter -->
+    <div class="production-counter-card">
+        <div class="production-counter-top">
+            <div>
+                <span class="production-counter-label">TOTAL PARTS PRODUCED</span>
+                <p>Current production run</p>
+            </div>
+            <div class="production-counter-icon">⚙</div>
+        </div>
+
+        <div class="production-counter-value">
+            {{ run.parts_count }}
+            <span>parts</span>
+        </div>
+
+        <div class="production-counter-footer">
+            <span class="counter-dot"></span>
+            Production quantity recorded
+        </div>
+    </div>
+
+    <!-- Periodic Quality Alert -->
+    {% if due %}
+    <div class="quality-alert">
+        <div class="quality-alert-icon">!</div>
+
+        <div class="quality-alert-content">
+            <h3>Periodic Quality Inspection Due</h3>
+            <p>A periodic quality check is required for this production run.</p>
+
+            {% if run.timer_paused %}
+            <div class="timer-paused-label">
+                ⏸ Job timer is PAUSED
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Production Actions -->
+    <div class="production-actions-card">
+        <div class="production-actions-header">
+            <h3>Production Actions</h3>
+            <p>Choose the appropriate action for this run.</p>
+        </div>
+
+        <form method="post" class="production-actions-form">
+            {% csrf_token %}
+
+            {% if not run.first_piece_approved %}
+            <button
+                type="submit"
+                name="action"
+                value="first_piece"
+                class="production-action-btn action-approve">
+                <span class="action-icon">✓</span>
+                <span>
+                    <strong>Approve First Piece</strong>
+                    <small>QA approval required</small>
+                </span>
+            </button>
+            {% endif %}
+
+            <button
+                type="submit"
+                name="action"
+                value="count"
+                class="production-action-btn action-count">
+                <span class="action-icon">+</span>
+                <span>
+                    <strong>Add 1 Part</strong>
+                    <small>Update production quantity</small>
+                </span>
+            </button>
+
+            <button
+                type="submit"
+                name="action"
+                value="check"
+                class="production-action-btn action-check">
+                <span class="action-icon">✓</span>
+                <span>
+                    <strong>Periodic Check Done</strong>
+                    <small>Record completion of the quality check</small>
+                </span>
+            </button>
+        </form>
+
+        <div class="production-actions-note">
+            Follow your site's QA and production procedures before submitting an action.
+        </div>
+    </div>
+
+</div>
+{% endblock %}

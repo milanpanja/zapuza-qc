@@ -1,0 +1,244 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | Zapuza QC{% endblock %}
+
+{% block content %}
+<style>
+    .form-page {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 8px 0 30px;
+        color: #172033;
+    }
+
+    .form-header {
+        margin-bottom: 22px;
+    }
+
+    .form-header h2 {
+        margin: 0 0 8px;
+        font-size: clamp(25px, 4vw, 32px);
+        font-weight: 750;
+        letter-spacing: -0.5px;
+        overflow-wrap: anywhere;
+    }
+
+    .form-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .form-card {
+        padding: clamp(18px, 4vw, 30px);
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
+    }
+
+    .form-card-header {
+        margin-bottom: 22px;
+        padding-bottom: 17px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .form-card-header h3 {
+        margin: 0 0 5px;
+        color: #111827;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .form-card-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .django-form p {
+        margin: 0 0 20px;
+    }
+
+    .django-form label {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .django-form input:not([type="checkbox"]):not([type="radio"]),
+    .django-form select,
+    .django-form textarea {
+        display: block;
+        width: 100%;
+        min-height: 44px;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: #fff;
+        color: #0f172a;
+        font: inherit;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .django-form textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .django-form input:focus,
+    .django-form select:focus,
+    .django-form textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px #dbeafe;
+    }
+
+    .django-form input[type="checkbox"],
+    .django-form input[type="radio"] {
+        width: 17px;
+        height: 17px;
+        min-height: 17px;
+        margin-right: 7px;
+        vertical-align: middle;
+        accent-color: #2563eb;
+    }
+
+    .django-form input[type="file"] {
+        min-height: auto;
+        padding: 10px;
+        background: #f8fafc;
+    }
+
+    .django-form .helptext,
+    .django-form p.help {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .django-form ul.errorlist {
+        margin: 0 0 8px;
+        padding: 10px 12px 10px 30px;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        background: #fef2f2;
+        color: #b91c1c;
+        font-size: 13px;
+    }
+
+    .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .save-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 140px;
+        min-height: 46px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 9px;
+        background: #15803d;
+        color: #fff;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s ease;
+    }
+
+    .save-button:hover {
+        background: #166534;
+    }
+
+    .save-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .form-note {
+        margin-top: 18px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    @media (max-width: 520px) {
+        .form-page {
+            padding: 4px 0 20px;
+        }
+
+        .form-card {
+            padding: 17px;
+            border-radius: 12px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .save-button {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="form-page">
+    <header class="form-header">
+        <h2>{{ title }}</h2>
+        <p>
+            Enter the required information below and review your details
+            before saving.
+        </p>
+    </header>
+
+    <section class="form-card">
+        <div class="form-card-header">
+            <h3>Form details</h3>
+            <p>Fields marked as required must be completed before saving.</p>
+        </div>
+
+        <form
+            method="post"
+            {% if multipart %}enctype="multipart/form-data"{% endif %}
+            class="django-form"
+        >
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <div class="form-actions">
+                <button type="submit" class="save-button">
+                    Save details
+                    <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </form>
+
+        <p class="form-note">
+            Please verify the information before saving. Uploaded documents
+            should be clear and relevant to the selected record.
+        </p>
+    </section>
+</div>
+{% endblock %}

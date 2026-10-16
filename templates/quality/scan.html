@@ -1,0 +1,566 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .inspection-start {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 12px;
+        color: #172033;
+    }
+
+    .inspection-header {
+        margin-bottom: 24px;
+    }
+
+    .inspection-header h2 {
+        margin: 0 0 8px;
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 750;
+        letter-spacing: -0.5px;
+    }
+
+    .inspection-header p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    .scan-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 18px;
+        padding: 14px 16px;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .scan-notice strong {
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .inspection-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 0.85fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+    .inspection-card {
+        min-width: 0;
+        padding: 22px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.045);
+    }
+
+    .card-heading {
+        margin: 0 0 6px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .card-description {
+        margin: 0 0 22px;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .scan-field {
+        margin-bottom: 22px;
+    }
+
+    .scan-field label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 650;
+    }
+
+    .field-hint {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .scan-input {
+        width: 100%;
+        min-height: 46px;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: #f8fafc;
+        color: #0f172a;
+        font: inherit;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .scan-input:focus {
+        outline: 3px solid #dbeafe;
+        border-color: #2563eb;
+    }
+
+    .scan-input[readonly] {
+        background: #f1f5f9;
+        cursor: default;
+    }
+
+    .scan-button {
+        width: 100%;
+        min-height: 44px;
+        margin-top: 9px;
+        padding: 10px 14px;
+        border: 1px solid #bfdbfe;
+        border-radius: 9px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 14px;
+        font-weight: 650;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .scan-button:hover {
+        background: #dbeafe;
+    }
+
+    .scan-button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .final-pdi {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 6px 0 22px;
+        padding: 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+        cursor: pointer;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .final-pdi input {
+        width: 18px;
+        height: 18px;
+        margin: 1px 0 0;
+        accent-color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    .submit-button {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 16px;
+        border: none;
+        border-radius: 10px;
+        background: #15803d;
+        color: white;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .submit-button:hover {
+        background: #166534;
+    }
+
+    .submit-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .scanner-card {
+        text-align: center;
+    }
+
+    .scanner-icon {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 12px;
+        border-radius: 14px;
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 25px;
+    }
+
+    #reader {
+        width: 100%;
+        max-width: 360px;
+        margin: 18px auto 12px;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+
+    #reader video {
+        border-radius: 10px;
+    }
+
+    #scan-status {
+        min-height: 24px;
+        margin: 12px 0 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .status-success {
+        color: #15803d !important;
+        font-weight: 650;
+    }
+
+    .status-error {
+        color: #b91c1c !important;
+    }
+
+    .scanner-tip {
+        margin: 14px 0 0;
+        padding-top: 14px;
+        border-top: 1px solid #e2e8f0;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.7;
+        text-align: left;
+    }
+
+    @media (max-width: 700px) {
+        .inspection-start {
+            padding: 8px;
+        }
+
+        .inspection-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .inspection-card {
+            padding: 18px;
+        }
+
+        .scanner-card {
+            order: -1;
+        }
+
+        #reader {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .inspection-card {
+            padding: 14px;
+        }
+
+        .inspection-header h2 {
+            font-size: 23px;
+        }
+    }
+</style>
+
+<div class="inspection-start">
+
+    <header class="inspection-header">
+        <h2>Start Inspection</h2>
+        <p>
+            Scan the machine QR plate and job traveler barcode
+            to open the inspection checklist.
+        </p>
+
+        <div class="scan-notice">
+            <span aria-hidden="true">🔒</span>
+            <div>
+                <strong>Barcode scanning required</strong>
+                {% if not manual %}
+                    Manual entry is disabled. Scan both labels using your device camera.
+                {% else %}
+                    Scanning is available. Manual entry is enabled for authorized users.
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="inspection-layout">
+
+        <section class="inspection-card">
+            <h3 class="card-heading">Inspection details</h3>
+            <p class="card-description">
+                Scan both identifiers before opening the checklist.
+            </p>
+
+            <form method="post" id="inspection-form">
+                {% csrf_token %}
+
+                <div class="scan-field">
+                    <label for="machine_qr">Machine QR plate</label>
+                    <input
+                        type="text"
+                        id="machine_qr"
+                        name="machine_qr"
+                        class="scan-input"
+                        placeholder="Scan machine QR"
+                        autocomplete="off"
+                        required
+                        {% if not manual %}readonly{% endif %}
+                    >
+                    <button
+                        type="button"
+                        class="scan-button"
+                        onclick="scanInto('machine_qr')"
+                    >
+                        Scan machine
+                    </button>
+                    <span class="field-hint">
+                        Scan the QR label attached to the machine.
+                    </span>
+                </div>
+
+                <div class="scan-field">
+                    <label for="job_qr">Job traveler barcode</label>
+                    <input
+                        type="text"
+                        id="job_qr"
+                        name="job_qr"
+                        class="scan-input"
+                        placeholder="Scan job traveler"
+                        autocomplete="off"
+                        required
+                        {% if not manual %}readonly{% endif %}
+                    >
+                    <button
+                        type="button"
+                        class="scan-button"
+                        onclick="scanInto('job_qr')"
+                    >
+                        Scan job
+                    </button>
+                    <span class="field-hint">
+                        Scan the barcode or QR code on the job traveler.
+                    </span>
+                </div>
+
+                <label class="final-pdi" for="final_pdi">
+                    <input
+                        type="checkbox"
+                        name="final_pdi"
+                        id="final_pdi"
+                    >
+                    <span>
+                        <strong>This is the FINAL PDI</strong><br>
+                        <span class="field-hint">
+                            Select this for the final pre-dispatch inspection.
+                        </span>
+                    </span>
+                </label>
+
+                <button type="submit" class="submit-button" id="submit-button">
+                    Open checklist →
+                </button>
+            </form>
+        </section>
+
+        <section class="inspection-card scanner-card">
+            <div class="scanner-icon" aria-hidden="true">▦</div>
+            <h3 class="card-heading">QR / Barcode Scanner</h3>
+            <p class="card-description">
+                Tap a scan button, allow camera access, and hold the label
+                steady inside the scanning area.
+            </p>
+
+            <div id="reader"></div>
+            <p id="scan-status" role="status" aria-live="polite">
+                Ready to scan. Choose Scan machine or Scan job.
+            </p>
+
+            <p class="scanner-tip">
+                <strong>Scanning tips</strong><br>
+                • Allow camera access when prompted.<br>
+                • Use good lighting and keep the label in focus.<br>
+                • Use HTTPS or localhost for browser camera access.<br>
+                • If scanning fails, check camera permissions and try again.
+            </p>
+        </section>
+
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    let scanner = null;
+    let scannerRunning = false;
+    let scanStarting = false;
+    let scanSession = 0;
+
+    const statusBox = document.getElementById("scan-status");
+    const scanButtons = document.querySelectorAll(".scan-button");
+
+    function setScanStatus(message, type = "") {
+        statusBox.textContent = message;
+        statusBox.className = type;
+    }
+
+    function setScanButtonsDisabled(disabled) {
+        scanButtons.forEach(button => {
+            button.disabled = disabled;
+        });
+    }
+
+    async function stopScanner() {
+        scanSession++;
+
+        if (scanner && scannerRunning) {
+            try {
+                await scanner.stop();
+            } catch (error) {
+                console.warn("Scanner stop:", error);
+            }
+        }
+
+        scannerRunning = false;
+        scanStarting = false;
+
+        if (scanner) {
+            try {
+                scanner.clear();
+            } catch (error) {
+                console.warn("Scanner clear:", error);
+            }
+            scanner = null;
+        }
+
+        setScanButtonsDisabled(false);
+    }
+
+    async function scanInto(id) {
+        if (scanStarting || scannerRunning) {
+            await stopScanner();
+        }
+
+        const target = document.getElementById(id);
+        const session = ++scanSession;
+
+        if (!window.Html5Qrcode) {
+            setScanStatus(
+                "Scanner library could not load. Check your internet connection and reload the page.",
+                "status-error"
+            );
+            return;
+        }
+
+        scanStarting = true;
+        setScanButtonsDisabled(true);
+        setScanStatus("Starting camera… Please allow camera access.");
+
+        try {
+            scanner = new Html5Qrcode("reader", {
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.QR_CODE,
+                    Html5QrcodeSupportedFormats.CODE_128,
+                    Html5QrcodeSupportedFormats.CODE_39,
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.UPC_E
+                ],
+                verbose: false
+            });
+
+            await scanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 180 } },
+                async (decodedText) => {
+                    if (session !== scanSession || !scannerRunning) return;
+
+                    target.value = decodedText;
+                    target.dispatchEvent(new Event("change", { bubbles: true }));
+
+                    setScanStatus(
+                        (id === "machine_qr" ? "Machine" : "Job traveler") +
+                        " scanned successfully.",
+                        "status-success"
+                    );
+
+                    await stopScanner();
+                },
+                () => {
+                    // Ignore individual frames where no code is detected.
+                }
+            );
+
+            if (session !== scanSession) {
+                try {
+                    await scanner.stop();
+                    scanner.clear();
+                } catch (error) {
+                    // Scanner may already have stopped.
+                }
+                return;
+            }
+
+            scannerRunning = true;
+            scanStarting = false;
+            setScanStatus("Camera active. Point it at the label.");
+        } catch (error) {
+            scannerRunning = false;
+            scanStarting = false;
+            setScanButtonsDisabled(false);
+
+            setScanStatus(
+                "Unable to start camera. Check browser permissions, camera availability, and HTTPS.",
+                "status-error"
+            );
+
+            if (scanner) {
+                try {
+                    scanner.clear();
+                } catch (clearError) {
+                    // Ignore cleanup errors.
+                }
+                scanner = null;
+            }
+
+            console.error("Camera error:", error);
+        }
+    }
+
+    document.getElementById("inspection-form").addEventListener("submit", function (event) {
+        const machine = document.getElementById("machine_qr").value.trim();
+        const job = document.getElementById("job_qr").value.trim();
+
+        if (!machine || !job) {
+            event.preventDefault();
+            setScanStatus(
+                "Please scan both the machine QR and job traveler barcode before continuing.",
+                "status-error"
+            );
+            return;
+        }
+
+        if (scannerRunning || scanStarting) {
+            event.preventDefault();
+            setScanStatus("Please wait for the scanner to stop before continuing.");
+        }
+    });
+
+    window.addEventListener("pagehide", function () {
+        if (scanner && scannerRunning) {
+            scanner.stop().catch(() => {});
+        }
+    });
+</script>
+{% endblock %}
